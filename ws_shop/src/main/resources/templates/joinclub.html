@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<h2>회원가입</h2>
+	<form action="/join" method="post">
+	<ul>
+		<li>
+			생성할 id: <input type="text" name="id" id="id">
+			<input type="button" onclick="checkid()" name="checkId" value="중복검사">
+		</li>
+		<li id="id-msg"></li>
+		
+		<li>
+			생성할 pw: <input type="password" name="pw">
+		</li>
+		<li>
+			<label><input type="radio" name="role" value="ROLE_member">회원</label>
+			<label><input type="radio" name="role" value="ROLE_admin">관리자</label>
+		</li>
+	</ul>
+		<input type="submit" value="생성하기">
+	</form>
+	
+	<script>
+		
+		
+		function checkid(){
+			const id = document.getElementById("id");
+			const xhttp = new XMLHttpRequest();
+			const idcheck = id.value;
+			xhttp.onload = function (){
+				document.getElementById("id-msg").innerHTML = this.responseText;
+				if(this.response == "중복된 아이디입니다."){
+					doublecheck = false;
+				}else {
+					doublecheck = true;
+					return true;
+				}
+			}
+			xhttp.open("GET","/doubleIdCheck?id=" + idcheck, true);
+			xhttp.send();
+		}
+	
+	</script>
+	
+</body>
+</html>

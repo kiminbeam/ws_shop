@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<header>
+		<div th:replace="~{/fragments/nav.html :: fragments-nav}"></div>
+	</header>
+	
+	<div>
+		<a href="@{/addGoods(id=${Session.id})}">제품등록</a>
+		<a href=" ">제품정보 수정</a>
+		<a href="@{/viewMygs(id=${Session.id})}">제품확인</a>
+	</div>
+</body>
+</html>

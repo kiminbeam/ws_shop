@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+<div th:fragment="fragments-nav">
+	<div class="navbar">
+		<div th:if="${member != Null}">
+			<p th:text="${member.id}"></p>
+			<a href="/logout">로그아웃</a>
+			<div th:if="${member.role == 'ROLE_admin'}">
+				<a href="@{/manage(id=${Session.id})}">제품관리</a>
+			</div>
+		</div>
+		<div th:if="${member == null}">
+			<a href="/login_page">로그인</a>
+			<a href="/joinclub">회원가입</a>
+		</div>
+	</div>
+</div>
+	<a href="/menu">제품</a>
+</body>
+</html>

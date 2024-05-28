@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<h2>등록된 제품목록</h2>
+	<hr>
+	<div th:each="goods : ${goods}" class="product">
+		<h3><a href="${goods.gname}"></a></h3><br>
+		<span th:text="${goods.member.id}"></span>
+		
+	</div>
+</body>
+</html>
