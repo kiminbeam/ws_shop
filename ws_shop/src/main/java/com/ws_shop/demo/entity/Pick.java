@@ -26,4 +26,8 @@ public class Pick {
 	private Goods goods;
 	
 	private int quantity;
+	
+	@ManyToOne
+	@JoinColumn(name="id")
+	private Member member;
 }

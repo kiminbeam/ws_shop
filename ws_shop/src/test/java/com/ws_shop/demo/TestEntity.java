@@ -13,12 +13,18 @@ public class TestEntity {
 	@Autowired
 	IMemberRepository memre;
 	
-	@Test
+	//@Test
 	public void insertdummis() {
 		Member member = new Member();
 		member.setId("aaaa");
 		member.setPw("1111");
 		member.setRole("ROLE_member");
 		memre.save(member);
+	}
+	
+	@Test
+	public void findByIdPw() {
+		Member member = memre.findByIdPw("abcd", "1234");
+		System.out.println(member.toString());
 	}
 }

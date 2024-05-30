@@ -24,5 +24,8 @@ public class Member {
 	private String pw;
 	
 	@Column(nullable = false)
+	private String name;
+	
+	@Column(nullable = false)
 	private String role;
 }

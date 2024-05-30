@@ -40,6 +40,9 @@ public class Goods {
 	@Column(nullable = false)
 	private int price;
 	
+	@Column(name="gdinfo", columnDefinition = "TEXT")
+	private String gdinfo;
+	
 	@ManyToOne
 	@JoinColumn(name = "id")
 	private Member member;

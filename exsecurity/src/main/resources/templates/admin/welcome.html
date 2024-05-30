@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+<h1>admin welcome</h1>
+<hr>
+<h2>Security Context로 얻어낸 UserDetails 객체(사용자정보 객체(Member)를 품은 객체)를 Model로 받아보기</h2>
+<p>[[${username1}]]</p>
+<p>[[${name1}]]</p>
+<hr>
+<h2>Principal 객체 값을 model로 받기</h2>
+<p>[[${username2}]]</p>
+<hr>
+<h2>@AuthenticationPrincipal을 사용하여 UserDetails의 구현체(CustomUserDetails 객체)를 파라미터 주입받아 사용하기</h2>
+<p>[[${username3}]]</p>
+<p>[[${name3}]]</p>
+<p>[[${role3}]]</p>
+</body>
+</html>

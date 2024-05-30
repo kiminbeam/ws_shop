@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<h2>제품 수정</h2>
+	<hr>
+	<form action="modifyGoods" method="post">
+		<input type="hidden" name="gid" th:value="${goods.gid}">
+		<input type="text" name="id" th:value="${member.id}" readonly><br>
+		<input type="text" name="gname" th:value="${goods.gname}"><br>
+		<input type="text" name="amount" th:value="${goods.amount}"><br>
+		<input type="text" name="price" th:value="${goods.price}"><br>
+		<textarea name="gdinfo" th:text="${goods.gdinfo}"></textarea><br>
+		<label><input type="radio" name="state" value="0">판매중</label>
+		<label><input type="radio" name="state" value="1">품절</label><br>
+		<input type="submit" value="수정하기">
+	</form>
+</body>
+</html>

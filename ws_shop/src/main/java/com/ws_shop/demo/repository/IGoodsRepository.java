@@ -12,4 +12,7 @@ public interface IGoodsRepository extends JpaRepository<Goods, Long>{
 	
 	@Query(value= "select * from goods where id= :id", nativeQuery=true)
 	public List<Goods> findByMemberId(@Param("id")String id);
+	
+	@Query(value= "select * from goods where gid = :gid", nativeQuery=true)
+	public Goods findOneById(@Param("gid") String gid);
 }

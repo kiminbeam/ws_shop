@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<h2>제품 상세페이지</h2>
+	<a th:href="@{/}">홈으로</a>
+	<a th:href="@{/modifyGs(gid=${goods.gid})}">제품 수정하기</a>
+	<hr>
+	<div>
+		상품명: <span th:text="${goods.gname}"></span><br>
+		가격: <span th:text="${goods.price}"></span><br>
+		재고: <span th:text="${goods.amount}"></span><br>
+		판매자: <span th:text="${goods.member.name}"></span><br>
+		제품설명<br>
+		<div>
+			<span th:text="${goods.gdinfo}"></span>
+		</div>
+	</div>
+</body>
+</html>

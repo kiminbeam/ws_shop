@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+<h1>내 픽업목록</h1>
+<hr>
+
+	
+	<form action="/gobasket" method="post">
+		<div th:each="pickList : ${pick}">
+		<span th:text="${pickList.goods.gname}"></span><br>
+		가격: <span th:text="${pickList.goods.price}"></span><br>
+		선택수량: <span th:text="${pickList.quantity}"></span>
+		<input type="checkbox" name="picknum" th:value="${pickList.picknum}">
+		<input type="hidden" name="id" th:value="${session.id}">
+		<input type="hidden" name="gid" th:value="${pickList.goods.gid}">
+		<hr>
+		</div>
+		<input type="submit" value="장바구니 담기">
+	</form>
+	
+
+</body>
+</html>

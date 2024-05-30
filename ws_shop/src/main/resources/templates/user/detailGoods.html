@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<h2>제품상세 목록</h2>
+	<a th:href="@{/}">홈으로</a>
+	<hr>
+	<div th:each="goods : ${goods}">
+		판매자: <span th:text="${goods.member.id}"></span>
+		<h3 th:text="${goods.gname}"></h3>
+		제품정보<br>
+		<span th:text="${goods.gdinfo}"></span><br>
+		가격:<span th:text="${goods.price}"></span>
+	</div>
+	<hr>
+	<div class="order">
+		<form action="/pickUp" method="post">
+			장바구니 담기<br>
+			제품정보 입니다.<br>
+			제품명: <span th:text="${goods.gname}"></span><br>
+			가격: <span th:text="${goods.price}"></span><br>
+			주문수량:<input type="text" name="quantity"><br>
+			<input type="hidden" name="gid" th:value="${goods.gid}">
+			<input type="hidden" name="memberId" th:value="${session.id}">
+			<input type="submit" value="담기">
+		</form>
+		
+	</div>
+</body>
+</html>

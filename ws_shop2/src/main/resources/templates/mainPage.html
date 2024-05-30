@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+	
+</head>
+<body>
+	<h1>mainPage</h1>
+	<hr>
+	<div th:if="${session.id != null}">
+		<p th:text="${session.id}"></p>
+		<p th:text="${session.name}"></p>
+		<div th:if="${session.role == 'ROLE_admin'}">
+			<a th:href="@{/manage}">제품관리</a>
+		</div>
+		<div th:if="${session.role == 'ROLE_member'}">
+			<a th:href="@{/mypickup}">픽업목록</a>
+		</div>
+		<a href="/logout">로그아웃</a>
+		<hr>
+		
+	</div>
+	<div th:if="${session.id == null}">
+		<a href="/login_page">로그인</a>
+		<a href="/joinclub">회원가입</a>
+	</div>
+	
+	<div th:each="goods : ${goods}">
+		<a th:href="@{/detailGoods(gid=${goods.gid})}" ><span th:text="${goods.gname}"></span></a><br>
+		<span th:text="${goods.price}"></span>
+		<hr>
+	</div>
+	
+		
+	
+
+
+</body>
+</html>

@@ -10,10 +10,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.ws_shop.demo.entity.Basket;
 import com.ws_shop.demo.entity.Goods;
 import com.ws_shop.demo.entity.Member;
+import com.ws_shop.demo.entity.Pick;
+import com.ws_shop.demo.repository.IBasketRepository;
 import com.ws_shop.demo.repository.IGoodsRepository;
 import com.ws_shop.demo.repository.IMemberRepository;
+import com.ws_shop.demo.repository.IPickRepository;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -29,14 +33,10 @@ public class MyController {
 	IGoodsRepository goodsRepository;
 	
 	@RequestMapping("/")
-	public String mainpage(Model model,HttpServletRequest request) {
-		String memberId = (String) request.getSession().getAttribute("id");
-		if(memberId != null) {
-			Optional<Member> memberOpt = memreposi.findById(memberId);
-			if(memberOpt.isPresent()) {
-				model.addAttribute("member", memberOpt.get());
-			}
-		}
+	public String mainpage(HttpServletRequest request, Model model) {
+		List<Goods> goods = goodsRepository.findAll();
+		
+		model.addAttribute("goods", goods);
 		return "/mainPage";
 	}
 	
@@ -46,16 +46,27 @@ public class MyController {
 	}
 	
 	@RequestMapping("/login")
-	public String login(@RequestParam("id") String id,@RequestParam("pw") String pw, Model model, HttpServletRequest request) {
-		Optional<Member> member = memreposi.findById(id);
-		Member mem = member.get();
+	public String login(Model model, HttpServletRequest request) {
 		
-		if(pw.equals(mem.getPw())) {
-			model.addAttribute("member", mem);
-			request.getSession().setAttribute("member",mem);
-			return "/mainPage";
-		}
-		return "/loginFalse";
+		HttpSession session = request.getSession();
+		String id = request.getParameter("id");
+		String pw = request.getParameter("pw");
+		
+		Member member = memreposi.findByIdPw(id, pw);
+		
+		//model.addAttribute("member", member);
+		session.setAttribute("member", member);
+		session.setAttribute("id", member.getId());
+		session.setAttribute("role", member.getRole());
+		session.setAttribute("name", member.getName());
+		System.out.println(member);
+		//request.getSession().setAttribute("name", member.getName());
+		//request.getSession().setAttribute("Role", member.getRole());
+		
+		List<Goods> goodsList = goodsRepository.findAll();
+		model.addAttribute("goods", goodsList);
+		
+		return "/mainpage";
 	}
 	
 	@RequestMapping("/logout")
@@ -93,37 +104,150 @@ public class MyController {
 	}
 	
 	@RequestMapping("/manage")
-	public String mange(Model model, @RequestParam("id")String id) {
-		Optional<Member> member = memreposi.findById(id);
-		model.addAttribute("member", member);
+	public String mange(Model model,HttpServletRequest request) {
 		
-		Member mem= member.get();
-		return "/admin/manage?id=" + mem.getId();
+		return "/admin/manage";
 	}
 	
+	//제품 등록 폼
 	@RequestMapping("/addGoods")
-	public String addGoods(Model model,@RequestParam("id")String id) {
-		Optional<Member> member= memreposi.findById(id);
+	public String addGoods(Model model,HttpServletRequest request) {
+		
+		String id = (String)request.getSession().getAttribute("id");
+		
+		Optional <Member> mem= memreposi.findById(id);
+		Member member = mem.get();
+		
+		System.out.println(member);
 		
 		model.addAttribute("member", member);
-		return "admin/addGoods";
+		
+		return "/admin/addGoods";
 	}
 	
 		
 	@RequestMapping("/addG")
-	public String addG(Goods goods) {
+	public String addG(Goods goods,HttpServletRequest request) {
+		HttpSession session = request.getSession();
+		Member member = (Member) session.getAttribute("member");
+		if(member == null) {
+			return "redirect:/mainpage";
+		}
+		
+		goods.setMember(member);
 		goodsRepository.save(goods);
 		
-		return "redirect:/admin/manage";
+		return "redirect:/manage";
 	}
 	
+	//등록제품 조회
 	@RequestMapping("/viewMygs")
-	public String viewMygs(Model model, @RequestParam("id")String id) {
-		
+	public String viewMygs(Model model,HttpServletRequest request) {
+		String id = (String) request.getSession().getAttribute("id");
 		List<Goods> goods= goodsRepository.findByMemberId(id);
+		
+		for(int i= 0 ; i < goods.size() ; i++) {
+			System.out.println(goods);
+		}
 		
 		model.addAttribute("goods", goods);
 		
 		return "admin/viewMygs";
+	}
+	
+	@RequestMapping("/detailMygs")
+	public String detailMygs(Model model,@RequestParam("gid") Long gid, HttpSession session){
+		System.out.println("aaaa.a..................................");
+		
+		String id = (String) session.getAttribute("id");
+		Optional<Goods> goods = goodsRepository.findById(gid);
+		
+		if(goods.isPresent()) {
+			Goods gs = goods.get();
+			model.addAttribute("goods", gs);
+			
+			Member mem = gs.getMember();
+			model.addAttribute("member", mem);
+		}
+		
+		return "admin/detailMygs";
+	}
+	
+	//제품정보 수정폼
+	@RequestMapping("/modifyGs")
+	public String modifyGs(Model model, @RequestParam("gid") Long gid, HttpServletRequest request ) {
+		String id = (String)request.getSession().getAttribute("id");
+		
+		Optional<Goods> goods = goodsRepository.findById(gid);
+		Goods gs = goods.get();
+		model.addAttribute("goods", gs);
+		
+		Member member = gs.getMember();
+		model.addAttribute("member", member);
+		
+		return "admin/modifyGs";
+	}
+	
+	//제품정보 수정 기능
+	@RequestMapping("/modifyGoods")
+	public String modifyGoods(Goods goods,HttpServletRequest request) {
+		HttpSession session = request.getSession();
+		
+		Member member = (Member)session.getAttribute("member");
+		
+		goods.setMember(member);
+		goodsRepository.save(goods);
+		
+		return "admin/detailMygs";
+	}
+	
+	//일반회원 제품상세페이지
+	@RequestMapping("/detailGoods")
+	public String detailGoods(@RequestParam("gid") Long gid, Model model) {
+		Optional<Goods> goods = goodsRepository.findById(gid);
+		Goods gs = goods.get();
+		
+		model.addAttribute("goods", gs);
+		
+		return "user/detailGoods";
+	}
+	
+	@Autowired
+	IPickRepository pickRepository;
+
+	@RequestMapping("/pickUp")
+	public String goBasket(Pick pick, @RequestParam("gid") Long gid, @RequestParam("memberId") String memberid) {
+		Goods goods = goodsRepository.findById(gid).orElse(null);
+		Member member = memreposi.findById(memberid).orElse(null);
+		
+		if(goods != null && member != null) {
+			pick.setMember(member);
+			pick.setGoods(goods);
+			pickRepository.save(pick);
+		}
+		
+		return "/mypickup?id="+ memberid;
+	}
+	
+	@RequestMapping("/mypickup")
+	public String mypickup(@RequestParam("id")String id, Model model) {
+		List<Pick> pickList = pickRepository.findBymemberid(id);
+		
+		model.addAttribute("pick", pickList);
+		
+		return "user/mypickup";
+	}
+	
+	@Autowired
+	IBasketRepository basketRepo;
+	
+	@RequestMapping("/gobasket")
+	public String gobasket(HttpServletRequest request,Model model) {
+		String id = (String)request.getSession().getAttribute("id");
+		List <Basket> basketList = basketRepo.findBymemberId(id);
+		
+		model.addAttribute("basket", basketList);
+		
+		return "user/mybasket";
 	}
 }
