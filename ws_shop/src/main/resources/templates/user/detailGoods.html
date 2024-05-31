@@ -24,7 +24,7 @@
 			가격: <span th:text="${goods.price}"></span><br>
 			주문수량:<input type="text" name="quantity"><br>
 			<input type="hidden" name="gid" th:value="${goods.gid}">
-			<input type="hidden" name="memberId" th:value="${session.id}">
+			<!-- <input type="hidden" name="memberId" th:value="${session.id}"> -->
 			<input type="submit" value="담기">
 		</form>
 		

@@ -1,12 +1,17 @@
 package com.ws_shop.demo.mycontroller;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -14,10 +19,12 @@ import com.ws_shop.demo.entity.Basket;
 import com.ws_shop.demo.entity.Goods;
 import com.ws_shop.demo.entity.Member;
 import com.ws_shop.demo.entity.Pick;
+import com.ws_shop.demo.entity.Receipt;
 import com.ws_shop.demo.repository.IBasketRepository;
 import com.ws_shop.demo.repository.IGoodsRepository;
 import com.ws_shop.demo.repository.IMemberRepository;
 import com.ws_shop.demo.repository.IPickRepository;
+import com.ws_shop.demo.repository.IReceiptRepository;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -31,6 +38,15 @@ public class MyController {
 	
 	@Autowired
 	IGoodsRepository goodsRepository;
+	
+	@Autowired
+	IBasketRepository basketRepo;
+	
+	@Autowired
+	IPickRepository pickRepository;
+	
+	@Autowired
+	IReceiptRepository receiptRepo;
 	
 	@RequestMapping("/")
 	public String mainpage(HttpServletRequest request, Model model) {
@@ -212,13 +228,14 @@ public class MyController {
 		return "user/detailGoods";
 	}
 	
-	@Autowired
-	IPickRepository pickRepository;
+	
 
 	@RequestMapping("/pickUp")
-	public String goBasket(Pick pick, @RequestParam("gid") Long gid, @RequestParam("memberId") String memberid) {
+	public String goBasket(Pick pick, @RequestParam("gid") Long gid, HttpServletRequest request) {
 		Goods goods = goodsRepository.findById(gid).orElse(null);
-		Member member = memreposi.findById(memberid).orElse(null);
+		
+		String id = (String) request.getSession().getAttribute("id");
+		Member member = memreposi.findById(id).orElse(null);
 		
 		if(goods != null && member != null) {
 			pick.setMember(member);
@@ -226,11 +243,12 @@ public class MyController {
 			pickRepository.save(pick);
 		}
 		
-		return "/mypickup?id="+ memberid;
+		return "redirect:/mypickup";
 	}
 	
 	@RequestMapping("/mypickup")
-	public String mypickup(@RequestParam("id")String id, Model model) {
+	public String mypickup(HttpServletRequest request, Model model) {
+		String id = (String) request.getSession().getAttribute("id");
 		List<Pick> pickList = pickRepository.findBymemberid(id);
 		
 		model.addAttribute("pick", pickList);
@@ -238,16 +256,127 @@ public class MyController {
 		return "user/mypickup";
 	}
 	
-	@Autowired
-	IBasketRepository basketRepo;
-	
-	@RequestMapping("/gobasket")
-	public String gobasket(HttpServletRequest request,Model model) {
-		String id = (String)request.getSession().getAttribute("id");
-		List <Basket> basketList = basketRepo.findBymemberId(id);
+	//픽업 한 물건들을 최종 장바구니로 옮기는 메서드
+	@RequestMapping("/getinBasket")
+	public String getinBasket(@RequestParam("picknum") List<Long> picknumList, HttpServletRequest request, @RequestParam("gid") List<Long> gidList,Model model) {
 		
+		String id = (String) request.getSession().getAttribute("id");
+		Member member = memreposi.findById(id).orElse(null);
+		
+		if(member != null) {
+			for(int i = 0; i < picknumList.size(); i++) {
+				Pick pick = pickRepository.findById(picknumList.get(i)).orElse(null);
+				Goods goods = goodsRepository.findById(gidList.get(i)).orElse(null);
+				
+				if(pick != null && goods != null) {
+					Basket basket = new Basket();
+					basket.setMember(member);
+					basket.setGoods(goods);
+					basket.setPick(pick);
+					
+					basketRepo.save(basket);
+				}
+			}
+		}
+		
+		List<Basket> basketList = basketRepo.findBymemberId(id);
 		model.addAttribute("basket", basketList);
 		
 		return "user/mybasket";
 	}
+	
+	
+	//메인 페이지의 장바구니 불러오기 메뉴 클릭시 실행되는 메서드 
+	@RequestMapping("/mybasket")
+	public String gobasket(HttpServletRequest request, Model model) {
+		String id = (String) request.getSession().getAttribute("id");
+		List <Basket> basketList = basketRepo.findBymemberId(id);
+		model.addAttribute("basket", basketList);
+		
+		return "user/mybasket";
+	}
+	
+	/*
+	//장바구니에서 물품 빼는 기능
+	@RequestMapping(value = "/removeFromBasket", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseEntity<String> removeFromBasket(@RequestParam("bnum") Long bnum, HttpServletRequest request ,Model model) {
+		//관련된 receipt 항목 삭제
+		receiptRepo.deleteByBasketBnum(bnum);
+		
+		//장바구니 항목 삭제 
+		basketRepo.deleteById(bnum);
+		
+		return ResponseEntity.ok("item removed successfully");
+	}
+	*/
+	
+	
+	@RequestMapping("/deleteOne")
+	public String deleteOne(Model model, @RequestParam("bnum") Long bnum, HttpServletRequest request) {
+		receiptRepo.deleteByBasketBnum(bnum);
+		
+		basketRepo.deleteById(bnum);
+		
+		String id = (String) request.getSession().getAttribute("id");
+		Member member = memreposi.findById(id).orElse(null);
+		
+		if(member != null) {
+			List <Basket> basketList = basketRepo.findBymemberId(id);
+			model.addAttribute("basket", basketList);
+		}
+		
+		return "user/mybasket";
+		
+	}
+	
+	
+	
+	// @RequestParam("orderDate") String orderDate
+	//주문내역으로 전송하는 메서드
+	@RequestMapping("/order")
+	public String order(HttpServletRequest request, @RequestParam("gid") List<Long> gidList
+			, @RequestParam("picknum") List<Long> picknumList
+			, @RequestParam("bnum") List<Long> bnumList
+			, Model model) {
+		
+		List<Receipt> receiptList = new ArrayList<>();
+		
+		String id = (String) request.getSession().getAttribute("id");
+		Member member = memreposi.findById(id).orElse(null);
+		
+		//시간 저장하는 코드
+		//LocalDateTime orderTime = LocalDateTime.parse(orderDate,DateTimeFormatter.ofPattern("yyyy-MM-dd")); 
+		
+		for(int i = 0; i < bnumList.size(); i++) {
+			Goods goods = goodsRepository.findById(gidList.get(i)).orElse(null);
+			Basket basket= basketRepo.findById(bnumList.get(i)).orElse(null);
+			
+			if(goods != null && basket != null) {
+				Receipt receipt = new Receipt();
+				receipt.setMember(member);
+				receipt.setGoods(goods);
+				receipt.setBasket(basket);
+				//receipt.setOrderDate(orderDate);
+				
+				receiptRepo.save(receipt);
+				receiptList.add(receipt);
+			}
+		}
+		
+		model.addAttribute("receipt", receiptList);
+		
+		return "user/orderpage";
+	}
+	
+	@RequestMapping("/userReceiptPage")
+	public String userReceiptPage(HttpServletRequest request,Model model) {
+		String id = (String)request.getSession().getAttribute("id");
+		List <Receipt> receiptList = receiptRepo.findAllByMemberId(id);
+		
+		model.addAttribute("receipt", receiptList);
+		
+		return "user/orderpage";
+	}
+	
 }

@@ -16,6 +16,8 @@
 		</div>
 		<div th:if="${session.role == 'ROLE_member'}">
 			<a th:href="@{/mypickup(id=${session.id})}">픽업목록</a>
+			<a th:href="@{/mybasket}">내 장바구니</a>
+			<a th:href="@{/userReceiptPage}">결제내역</a>
 		</div>
 		<a href="/logout">로그아웃</a>
 		<hr>
@@ -32,9 +34,5 @@
 		<hr>
 	</div>
 	
-		
-	
-
-
 </body>
 </html>

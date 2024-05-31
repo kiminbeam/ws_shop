@@ -18,5 +18,10 @@
 <p>[[${username3}]]</p>
 <p>[[${name3}]]</p>
 <p>[[${role3}]]</p>
+<hr>
+<h2>타임리프에서 직접 접근</h2>
+<p>welcome, <span sec:authentication="name"></span>!</p>
+<p>welcome, <span sec:authentication="principal.name"></span>!</p>
+<p>welcome, <span sec:authentication="principal.role"></span>!</p>
 </body>
 </html>

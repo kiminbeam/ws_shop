@@ -22,10 +22,10 @@ public class SecurityConfig {
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
 		http.authorizeHttpRequests((auth) -> auth
-				.requestMatchers("/","/joinForm", "/registProc").permitAll()
+				.requestMatchers("/","/joinForm", "/registProc").authenticated()
 				.requestMatchers("/members/**").hasAnyRole("ADMIN","MEMBER")
 				.requestMatchers("/admin/**").hasRole("ADMIN")
-				.anyRequest().authenticated()
+				.anyRequest().permitAll()
 				);
 		
 		//내가 직접만든 로그인 페이지로 보내는 것

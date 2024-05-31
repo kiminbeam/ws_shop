@@ -1,5 +1,6 @@
 package com.ws_shop.demo.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -36,5 +37,8 @@ public class Receipt {
 	@ManyToOne
 	@JoinColumn(name = "gid")
 	private Goods goods;
+	
+	@Column(name= "order_date")
+	private String orderDate;
 	
 }

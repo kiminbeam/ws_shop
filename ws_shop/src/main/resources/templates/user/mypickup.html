@@ -6,22 +6,17 @@
 </head>
 <body>
 <h1>내 픽업목록</h1>
+<a th:href="@{/}">홈으로</a>
 <hr>
-
-	
-	<form action="/gobasket" method="post">
+	<form action="/getinBasket" method="post">
 		<div th:each="pickList : ${pick}">
-		<span th:text="${pickList.goods.gname}"></span><br>
-		가격: <span th:text="${pickList.goods.price}"></span><br>
-		선택수량: <span th:text="${pickList.quantity}"></span>
 		<input type="checkbox" name="picknum" th:value="${pickList.picknum}">
-		<input type="hidden" name="id" th:value="${session.id}">
 		<input type="hidden" name="gid" th:value="${pickList.goods.gid}">
+		<span th:text="${pickList.goods.gname}"></span><br>
+		<span th:text="${pickList.goods.price}"></span><br>
 		<hr>
 		</div>
 		<input type="submit" value="장바구니 담기">
 	</form>
-	
-
 </body>
 </html>

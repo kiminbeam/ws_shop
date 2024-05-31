@@ -3,10 +3,62 @@
 <head>
 <meta charset="UTF-8">
 <title>Insert title here</title>
+<script>
+	function removeItem(bnum){
+		if(confirm("이 제품을 장바구니에서 빼시겠습니까?")){
+			window.location.href = "/removeFromBasket?bnum=" + bnum;
+		}
+	}
+</script>
+
 </head>
 <body>
 <h1>최종 장바구니</h1>
+<a th:href="@{/}">홈으로</a>
 <hr>
+<form id="orderForm" action="/order" method="post">
+	<div th:each="basket : ${basket}">
+		<input type="hidden" name="gid" th:value="${basket.goods.gid}">
+		<input type="hidden" name="picknum" th:value="${basket.pick.picknum}">
+		<input type="hidden" name="bnum" th:value="${basket.bnum}">
+		
+		상품명: <span th:text="${basket.goods.gname}"></span><br>
+		가격: <span th:text="${basket.goods.price}"></span><br>
+		수량: <span th:text="${basket.pick.quantity}"></span><br>
+		<!-- <button type="button" th:onclick="removeItem([[${basket.bnum}]])">주문목록에서 빼기</button> -->
+		<button th:onclick="deleteItem([[${basket.bnum}]])">주문목록에서 빼기</button>
+		<hr>
+	</div>
+	<!-- <input type="hidden" id="orderDate" name="orderDate"> -->
+	<input type="submit" value="주문하기">
+</form>
+
+
+<script>
+function deleteItem(bnum){
+	document.getElementById("orderForm").action ="/deleteOne?bnum=" + bnum;
+	document.getElementById("orderForm").submit();
+	//window.location.href="/deleteOne?bnum=" + bnum;
+}
+
+
+
+
+
+
+
+function removeItem(bnum) {
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", "/removeFromBasket?bnum=" + bnum, true);
+    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState == 4 && xhr.status == 200) {
+            location.reload(); // 목록 새로고침
+        }
+    };
+    xhr.send();
+}
+</script>
 
 </body>
 </html>

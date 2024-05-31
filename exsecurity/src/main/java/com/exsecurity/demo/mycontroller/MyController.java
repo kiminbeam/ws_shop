@@ -59,11 +59,13 @@ public class MyController {
 	
 	@RequestMapping("/login")
 	public String loginForm() {
-		return "loginForm";
+		System.out.println("loginForm..........................");
+		return "login";
 	}
 	
 	@RequestMapping("/success")
 	public String success() {
+		System.out.println("success........................");
 		return "success";
 	}
 	
