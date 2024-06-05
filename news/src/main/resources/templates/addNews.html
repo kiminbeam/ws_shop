@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+<h1>기사등록 페이지</h1>
+기자 명 : <input type="text" name="writer"><br>
+작성날짜 : <input type="text" name="date"><br>
+헤드라인 : <input type="text" name="headline"><br>
+<span>기사</span><br>
+<textarea name="content"></textarea>
+
+<button onclick="postNews()">등록요청</button>
+
+<script>
+	function postNews(){
+		const writer_ = document.querySelector("input[name='writer']");
+		const headline_ = document.querySelector("input[name='headline']");
+		const date_ = document.querySelector("input[name='date']");
+		const content_ = document.querySelector("textarea[name='content']");
+		
+		const news = {
+				writer : writer_.value,
+				headline : headline_.value,
+				date : date_.value,
+				content : content_.value
+		}
+		
+		console.log(news);
+		
+		const sendData = JSON.stringify(news);
+		
+		const xhttp = new XMLHttpRequest();
+		xhttp.onload = function(){
+			
+		}
+		xhttp.open("POST", "/api/postNews");
+		xhttp.setRequestHeader("Content-Type", "application/json");
+		xhttp.send(sendData);
+	}
+</script>
+</body>
+</html>

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+<h1>input ex</h1>
+<hr>
+	name: <input type="text" id="name"><br>
+	email: <input type="text" id="email"><br>
+	addr: <input type="text" id="addr"><br>
+	
+	<button id="post" onclick="postData()">등록</button>
+	
+	<div id="post_content"></div>
+	
+	<hr>
+	
+	<h2>조회</h2>
+	
+	<input type="text" id="getName"><br>
+	<button id="get" onclick="getData()">조회</button>
+	
+	<div id="get_content"></div>
+	
+	<hr>
+	
+	<h2>수정</h2>
+	
+	name: <input type="text" id="putName"><br>
+	email: <input type="text" id="putEmail"><br>
+	addr: <input type="text" id="putAddr"><br>
+	id: <input type="text" id="putID"><br>
+	
+	<button id="put" onclick="putData()">수정</button>
+	
+	<div id="put_content"></div>
+		
+		
+		
+	<script>
+		function postData(){
+			const name= document.getElementById("name").value;
+			const email = document.getElementById("email").value;
+			const addr = document.getElementById("addr").value;
+			
+			const xhttp = new XMLHttpRequest();
+			xhttp.onload = function(){
+				document.getElementById("post_content").innerHTML = this.responseText;
+			}
+			xhttp.open("POST", "/api/v1/post-api/member4");
+			xhttp.setRequestHeader("Content-Type", "application/json");
+			xhttp.send(JSON.stringify({"name": name, "email": email, "addr": addr}));
+		}
+		
+		function getData(){
+			const getName = document.getElementById("getName").value;
+			
+			const xhttp = new XMLHttpRequest();
+			xhttp.onload = function(){
+				document.getElementById("get_content").innerHTML = this.responseText;
+			}
+			xhttp.open("GET", "/api/v1/get-api/request4?name=" + getName);
+			xhttp.send();
+		}
+		
+		
+		function putData(){
+			const putName = document.getElementById("putName").value;
+			const putEmail = document.getElementById("putEmail").value;
+			const putAddr = document.getElementById("putAddr").value;
+			const putId = document.getElementById("putID").value;
+			
+			const xhttp = new XMLHttpRequest();
+			xhttp.onload = function(){
+				document.getElementById("put_content").innerHTML = this.responseText;
+			}
+			xhttp.open("PUT", "/api/v1/put-api/member5");
+			xhttp.setRequestHeader("Content-Type","application/json");
+			xhttp.send(JSON.stringify({"mno" : putId ,"name": putName, "email" : putEmail, "addr" : putAddr}));
+		}
+		
+		
+	</script>
+</body>
+</html>

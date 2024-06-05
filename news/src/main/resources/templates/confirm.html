@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+</head>
+<body>
+<h1>편집장 승인 페이지</h1>
+<hr>
+<div id="con"></div>
+
+<script>
+	$(document).ready(function(){
+		$.ajax({
+			url: '/api/confirm',
+			type: 'GET',
+			dataType: 'json',
+			success: function(response){
+				let titleHtml = '';
+				response.forEach(function(news){
+					titleHtml += '<a href="/detailCf?nno=' + news.nno + '">' + news.headline + '</a>' + '<p>' + "작성기자: " + news.writer + '</p><hr>';
+				});
+				$('#con').html(titleHtml);
+			},
+			error: function(xhr, status, error) {
+				console.error('Error: ', error);
+				$('con').text('데이터를 불러오는데 실패했습니다.');
+			}
+		});
+	});
+</script>
+</body>
+</html>

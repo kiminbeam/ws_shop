@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+<script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+
+</head>
+<body>
+<h2>메모 저장하기</h2>
+<input type="text" name="title" placeholder="input title"><br>
+<input type="text" name="content" placeholder="input content"><br>
+<input type="text" name="writer" placeholder="input writer"><br>
+<button onclick="postMemo()">Memo 저장하기</button>
+<div id="result_save"></div>
+
+<hr>
+<h2>메모 조회하기</h2>
+<input type="text" name="mno" placeholder="input mno.."><br>
+<button onclick="getMemo()">Memo 조회하기</button>
+<div id="result_get"></div>
+
+<hr>
+<h2>메모 수정하기</h2>
+<input type="text" name="mno2" placeholder="input mno"><br>
+<input type="text" name="title2" placeholder="input title"><br>
+<input type="text" name="content2" placeholder="input content"><br>
+<input type="text" name="writer2" placeholder="input writer"><br>
+<button onclick="putMemo()">Memo 수정하기</button>
+<div id="result_put"></div>
+
+<hr>
+<h2>메모 삭제하기</h2>
+<input type="text" name="mno3" placeholder="input mno.."><br>
+<button onclick="deleteMemo()">Memo 삭제하기</button>
+<div id="result_delete"></div>
+
+
+
+<script>
+function postMemo(){
+	
+	const title_ = document.querySelector("input[name='title']");
+	const content_ = document.querySelector("input[name='content']");
+	const writer_ = document.querySelector("input[name='writer']");
+	
+	//가져온 입력데이터를 객체로 만들기 >> JSON으로 변경하여 서버에 전송하기 위해
+	const memo = {
+			title : title_.value,
+			content : content_.value,
+			writer : writer_.value
+	}
+	//객체를 JSON으로 변경하기
+	const sendData = JSON.stringify(memo);
+	
+	//fetch 구조 
+	fetch("/memoapp/memo", {
+		method: "POST", 
+		headers: {
+			"Content-Type" : "application/json"
+		},
+		body: sendData
+	})
+	.then(response => response.text()) //응답자료 텍스트로 처리
+	.then(data => document.getElementById("result_save").innerHTML = data)
+	.catch(error => document.getElementById("result_save").innerHTML = error);
+	
+	/*
+	const xhttp = new XMLHttpRequest();
+	xhttp.onload = function(){ // 서버가 등록처리 후 결과 데이터를 보내주면 responseText로 받는다.
+		document.getElementById("result_save").innerHTML = this.responseText;
+	}
+	xhttp.open("POST","/memoapp/memo");
+	xhttp.setRequestHeader("Content-type", "application/json");
+	xhttp.send(sendData);
+	*/
+}
+
+function getMemo(){
+	//DB에 검색할 때 쓰는 텍스트박스
+	const mno_ = document.querySelector("input[name='mno']");
+	
+	//수정하기 위한 입력양식 식별하기...
+	const mno2_ = document.querySelector("input[name='mno2']")
+	const title_ = document.querySelector("input[name='title2']");
+	const content_ = document.querySelector("input[name='content2']");
+	const writer_ = document.querySelector("input[name='writer2']");
+	
+	fetch("/memoapp/memo?mno=" + mno_.value, {
+		method: "GET"
+	})
+	.then(response => response.text())
+	.then(data => {
+		const obj = JSON.parse(data);
+		document.getElementById("result_get").innerHTML = obj.mno + ", " + obj.title + ", " + obj.content + ", " + obj.writer;
+		mno2_.value = obj.mno;
+		title_.value = obj.title;
+		content_.value = obj.content;
+		writer_.value = obj.writer;
+	})
+	.catch(error => document.getElementById("result_get").innerHTML = error);
+	
+	/*
+	const xhttp = new XMLHttpRequest();
+	xhttp.onload = function(){
+		document.getElementById("result_get").innerHTML = this.responseText;
+		
+		const obj = JSON.parse(this.responseText);
+		mno2_.value = obj.mno;
+		title_.value = obj.title;
+		content_.value = obj.content;
+		writer_.value = obj.writer;
+		
+	}
+	xhttp.open("GET","/memoapp/memo?mno=" + mno_.value);
+	//xhttp.setRequestHeader("Content-type", "application/json");
+	xhttp.send();
+	*/
+}
+
+function putMemo(){
+	const mno_ = document.querySelector("input[name='mno2']");
+	
+	const title_ = document.querySelector("input[name='title2']");
+	const content_ = document.querySelector("input[name='content2']");
+	const writer_ = document.querySelector("input[name='writer2']");
+	
+	//가져온 입력데이터를 객체로 만들기 >> JSON으로 변경하여 서버에 전송하기 위해
+	const memo = {
+			mno : mno_.value,
+			title : title_.value,
+			content : content_.value,
+			writer : writer_.value
+	}
+	//객체를 JSON으로 변경하기
+	const sendData = JSON.stringify(memo);
+	
+	fetch("/memoapp/memo", {
+		method: "PUT",
+		headers: {
+			"Content-Type" : "application/json"
+		},
+		body: sendData
+	})
+	.then(response => response.text())
+	.then(data => document.getElementById("result_put").innerHTML = data)
+	.catch(error => document.getElementById("result_put").innerHTML = error);
+	
+	/*
+	const xhttp = new XMLHttpRequest();
+	xhttp.onload = function(){ // 서버가 등록처리 후 결과 데이터를 보내주면 responseText로 받는다.
+		document.getElementById("result_put").innerHTML = this.responseText;
+	}
+	xhttp.open("PUT","/memoapp/memo");
+	xhttp.setRequestHeader("Content-type", "application/json");
+	xhttp.send(sendData);
+	*/
+}
+
+function deleteMemo(){
+	const mno_ = document.querySelector("input[name='mno3']");
+	
+	fetch("/memoapp/memo/"+ mno_.value, {
+		method: "DELETE"
+	})
+	.then(response => response.text())
+	.then(data => document.getElementById("result_delete").innerHTML = data)
+	.catch(error => document.getElementById("result_delete").innerHTML = error);
+	
+	/*
+	const xhttp = new XMLHttpRequest();
+	xhttp.onload = function(){
+		document.getElementById("result_delete").innerHTML = this.responseText;
+	}
+	xhttp.open("DELETE","/memoapp/memo/"+ mno_.value);
+	xhttp.send();
+	*/
+}
+</script>
+
+</body>
+</html>

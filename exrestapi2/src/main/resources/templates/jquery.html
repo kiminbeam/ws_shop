@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+</head>
+<body>
+	<div id="randomHi"></div><br>
+	
+	<h1>Ajax Example</h1>
+	<hr>
+	<form id="myForm">
+		<input type="text" name="username">
+		<input type="password" name="password">
+		<button type="submit">submit</button>
+	</form>
+	
+	<button onclick="ajaxFunc()">JSON 데이터 전송</button>
+	
+	<button onclick="checkId()">아이디 중복확인</button>
+	<div id="checkResult"></div>
+	
+	<script>
+		$(document).ready(function(){
+			//폼 데이터 서버에 전송하고 응답받기
+			$('#myForm').on('submit', function(e){
+				e.preventDefault();
+				
+				//폼 데이터를 객체로 직렬화
+				var formData = $(this).serialize();
+				
+				$.ajax({
+					url: 'api/submitForm',//서버의 엔트포인트 URL
+					type: 'POST',//요청방식
+					data: formData,//전송할 데이터
+					success : function(response){
+						console.log('Success:',response);
+					},
+					error : function(xhr, status, error){
+						console.log('XMLHttpRequest 객체 : ', xhr);
+						console.log('Status : ', status);
+						console.log('error:',error);
+						
+						if(xhr.status === 404){
+							console.log("리소스가 없습니다.(주소 확인 필요)")
+						}else if(xhr.status === 500){
+							console.log("뭔가 문제가 있습니다.(메시지를 확인하세요.)")
+						}else{
+							console.log("다른 알려지지 않은 문제가 있는 것 같습니다.")
+						}
+					}
+				});
+			});
+		});
+		
+		
+		function ajaxFunc(){
+			const jsonData = {
+					username : "testUser",
+					password : "1234"
+			};
+			
+			$.ajax({
+				url: "/api/submitJson", //서버의 엔드포인트 URL
+				type:  "POST", //HTTP 메소드 타입
+				contentType: "application/json", //전송할 데이터의 형식 - 여기서는 json
+				data: JSON.stringify(jsonData), //전송할 데이터
+				success: function(response){
+					console.log(response);
+				}, //성공적으로 완료되었을 때 서버가 보내는 메시지
+				error: function(){
+					console.log("실패했습니다.");
+				}//실패했을 때 실행될 코드
+			});
+		}
+		
+		function checkId(){
+			const username = document.querySelector("input[name='username']");
+			
+			$.ajax({
+				url: "/api/checkId",
+				type: "GET",
+				data: {username: username},
+				success: function(response){
+					$('#checkResult').text(response);
+				},
+				error: function(xhr, status, error){
+					if(xhr.status === 409){
+						$('#checkResult').text(xhr.responseText);
+					}else {
+						$('#checkResult').text('오류발생: ' + error);
+					}
+				}
+			});
+		}
+		
+	</script>
+	
+</body>
+</html>

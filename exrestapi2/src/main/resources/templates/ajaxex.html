@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+</head>
+<body>
+	<h2>메모 저장하기</h2>
+	<input type="text" name="title" placeholder="input title"><br>
+	<input type="text" name="content" placeholder="input content"><br>
+	<input type="text" name="writer" placeholder="input writer"><br>
+	<button onclick="postMemo()">Memo 저장하기</button>
+	<div id="result_save"></div>
+	
+	<hr>
+	<h2>메모 조회하기</h2>
+	<input type="text" name="mno" placeholder="input mno.."><br>
+	<button onclick="getMemo()">Memo 조회하기</button>
+	<div id="result_get"></div>
+	
+	<hr>
+	<h2>메모 수정하기</h2>
+	<input type="text" name="mno2" placeholder="input mno"><br>
+	<input type="text" name="title2" placeholder="input title"><br>
+	<input type="text" name="content2" placeholder="input content"><br>
+	<input type="text" name="writer2" placeholder="input writer"><br>
+	<button onclick="putMemo()">Memo 수정하기</button>
+	<div id="result_put"></div>
+	
+	<hr>
+	<h2>메모 삭제하기</h2>
+	<input type="text" name="mno3" placeholder="input mno.."><br>
+	<button onclick="deleteMemo()">Memo 삭제하기</button>
+	<div id="result_delete"></div>
+
+	<script>
+		function postMemo(){
+			const title_ = document.querySelector("input[name='title']");
+			const content_ = document.querySelector("input[name='content']");
+			const writer_ = document.querySelector("input[name='writer']");
+			
+			const ajaxData = {
+					title : title_.value, 
+					content : content_.value,
+					writer : writer_.value
+			};
+			
+			$.ajax({
+				url: "/memoapp/memo",
+				type: "POST",
+				contentType: "application/json",
+				data: JSON.stringify(ajaxData),
+				success: function(response){
+					console.log(response);
+					$('#result_save').html(
+						'<p>Title: ' + response.title + '</p>' +
+						'<p>content: ' + response.content + '</p>' +
+						'<p>writer: ' + response.writer + '</p>'
+					);
+				},
+				error: function(){
+					console.log("error 발생");
+				}
+			});
+		}
+		
+		function getMemo(){
+			const mno1_ = document.querySelector("input[name='mno']");
+			
+			const mno2_ = document.querySelector("input[name='mno2']");
+			const title_ = document.querySelector("input[name='title2']");
+			const content_ = document.querySelector("input[name='content2']");
+			const writer_ = document.querySelector("input[name='writer2']");
+			
+			$.ajax({
+				url: "/memoapp/memo?mno=" + mno1_.value,
+				type: "GET",
+				contentType: "application/json",
+				success: function(response){
+					$('#result_get').html(
+						'<p>Title: ' + response.title + '</p>' +
+						'<p>content: ' + response.content + '</p>' +
+						'<p>writer: ' + response.writer + '</p>'
+					);
+					
+					mno2_.value = response.mno;
+					title_.value =response.title;
+					content_.value = response.content;
+					writer_.value = response.writer;
+				}
+				
+			});
+		}
+		
+		function putMemo(){
+			const mno_ = document.querySelector("input[name=mno2]");
+			const title_ = document.querySelector("input[name='title2']");
+			const content_ = document.querySelector("input[name='content2']");
+			const writer_ = document.querySelector("input[name='writer2']");
+			
+			const ajaxData = {
+					mno : mno_.value,
+					title : title_.value, 
+					content : content_.value,
+					writer : writer_.value
+			};
+			
+			$.ajax({
+				url: "/memoapp/memo",
+				type: "PUT",
+				contentType: "application/json",
+				data: JSON.stringify(ajaxData),
+				success: function(response){
+					console.log(response);
+					$('#result_put').html(
+						'<p>Title: ' + response.title + '</p>' +
+						'<p>content: ' + response.content + '</p>' +
+						'<p>writer: ' + response.writer + '</p>'
+					);
+				},
+				error: function(){
+					console.log("error 발생");
+				}
+			});
+		}
+		
+		function deleteMemo(){
+			const mno_ = document.querySelector("input[name=mno3]");
+			
+			$.ajax({
+				url: "/memoapp/memo/" + mno_.value,
+				type: "DELETE",
+				contentType: "application/json",
+				success: function(response){
+					$('#result_delete').html(
+						'<p>Title: ' + response.title + '</p>' +
+						'<p>content: ' + response.content + '</p>' +
+						'<p>writer: ' + response.writer + '</p>'
+					);
+				}
+				
+			});
+			
+		}
+	</script>
+</body>
+</html>
