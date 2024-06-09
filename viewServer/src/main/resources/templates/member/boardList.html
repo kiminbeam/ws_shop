@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+<h1>board List</h1>
+<hr>
+<div>
+	<table border="1">
+		<tr>
+			<th>bno</th><th>title</th><th>writer</th><th>originName</th><th>img</th>
+		</tr>
+	</table>
+	<tbody>
+		<tr th:each="board : ${boardList}">
+			<td>[[${board.bno}]]</td>
+			<td><a th:herf="@{|/member/detail?bno=${board.bno}|}">[[${board.title}]]</a></td>
+			<td>[[${board.member.username}]]</td>
+			<td>[[${board.originName}]]</td>
+			<td><img th:src="@{/images/{thumbnail}(thumbnail=${board.thumbnailName})}"></td>
+		</tr>
+	</tbody>
+</div>
+</body>
+</html>
